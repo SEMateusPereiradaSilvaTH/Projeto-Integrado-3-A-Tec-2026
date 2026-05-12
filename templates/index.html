@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TelaCheia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --card: #16161f;
+      --accent: #c084fc;
+      --accent2: #a855f7;
+      --text: #f5f5f5;
+      --muted: #ffffff;
+      --border: rgba(192, 132, 252, 0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 2rem;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo span { color: var(--accent2); }
+
+    .search-form {
+      display: flex;
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 3rem 0.6rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.08);
+    }
+
+    .search-btn {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--accent);
+      border: none;
+      border-radius: 5px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .search-btn:hover { background: #d8a4ff; }
+    .search-btn svg { width: 14px; height: 14px; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .sobre-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      text-shadow: 0 0 12px rgba(192, 132, 252, 0.8);
+      transition: text-shadow 0.3s;
+    }
+
+    .sobre-link:hover { text-shadow: 0 0 20px rgba(192, 132, 252, 1); }
+
+    .dropdown { position: relative; }
+
+    .dropdown-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+
+    .dropdown-btn:hover, .dropdown-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .dropdown-btn svg {
+      width: 12px;
+      height: 12px;
+      transition: transform 0.2s;
+    }
+
+    .dropdown-btn.active svg { transform: rotate(180deg); }
+
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.5rem;
+      min-width: 190px;
+      flex-direction: column;
+      gap: 0.1rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      z-index: 200;
+      display: none;
+    }
+
+    .dropdown-menu.open { display: flex; }
+
+    .dropdown-menu.anos {
+      max-height: 280px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+    }
+
+    .dropdown-item {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(192, 132, 252, 0.12);
+      color: var(--accent);
+    }
+
+    .hero {
+      padding: 4rem 2rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .hero-title em {
+      font-style: normal;
+      color: var(--accent);
+      -webkit-text-stroke: 1px var(--accent);
+    }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      margin-bottom: 2.5rem;
+    }
+
+    .section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
+
+    .section-count {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .movies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .movie-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+      animation: fadeUp 0.5s ease both;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px var(--accent);
+      border-color: var(--accent);
+    }
+
+    .movie-card:nth-child(1) { animation-delay: 0.05s; }
+    .movie-card:nth-child(2) { animation-delay: 0.1s; }
+    .movie-card:nth-child(3) { animation-delay: 0.15s; }
+    .movie-card:nth-child(4) { animation-delay: 0.2s; }
+    .movie-card:nth-child(5) { animation-delay: 0.25s; }
+    .movie-card:nth-child(6) { animation-delay: 0.3s; }
+    .movie-card:nth-child(7) { animation-delay: 0.35s; }
+    .movie-card:nth-child(8) { animation-delay: 0.4s; }
+
+    .poster-wrap {
+      position: relative;
+      aspect-ratio: 2/3;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .poster-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .movie-card:hover .poster-wrap img { transform: scale(1.05); }
+
+    .no-poster {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 2rem;
+    }
+
+    .rating-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.03em;
+    }
+
+    .tipo-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .tipo-filme { border: 1px solid #60a5fa; color: #60a5fa; }
+    .tipo-serie { border: 1px solid #34d399; color: #34d399; }
+
+    .card-body {
+      padding: 0.75rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    .card-year {
+      font-size: 0.72rem;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+    .empty-text { font-size: 1rem; font-weight: 300; }
+
+    /* Paginação */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .page-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      padding: 0.5rem 1.2rem;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .page-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(192, 132, 252, 0.08);
+    }
+
+    .page-btn.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .page-number {
+      font-size: 0.85rem;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      opacity: 0.5;
+      letter-spacing: 0.05em;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    .login-btn {
+      background: var(--accent);
+      color: #0a0a0f;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 7px;
+      white-space: nowrap;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .login-btn:hover {
+      background: #d8a4ff;
+      box-shadow: 0 0 14px rgba(192, 132, 252, 0.5);
+    }
+
+    @media (max-width: 600px) {
+      .header-inner { gap: 1rem; }
+      .hero { padding: 2rem 1rem 1rem; }
+      .section { padding: 0 1rem 3rem; }
+      .movies-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+      .nav-links { gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">Tela<span>Cheia🍿</span></a>
+      <form class="search-form" action="/buscar" method="get">
+        <input
+          class="search-input"
+          type="text"
+          name="q"
+          placeholder="Buscar filme, série ou anime..."
+          value="{{ request.args.get('q', '') }}"
+          autocomplete="off"
+        />
+        <button class="search-btn" type="submit" aria-label="Buscar">
+          <svg fill="none" stroke="#0a0a0f" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="nav-links">
+
+        <!-- Dropdown Gêneros -->
+        <div class="dropdown">
+          <button class="dropdown-btn" onclick="toggleDropdown('generos')" id="btn-generos">
+            Gêneros
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="dropdown-menu" id="generos">
+            <a class="dropdown-item" href="/genero/28">💥 Ação</a>
+            <a class="dropdown-item" href="/genero/12">🗺️ Aventura</a>
+            <a class="dropdown-item" href="/genero/16">🎨 Animação</a>
+            <a class="dropdown-item" href="/genero/35">😂 Comédia</a>
+            <a class="dropdown-item" href="/genero/80">🔫 Crime</a>
+            <a class="dropdown-item" href="/genero/18">🎭 Drama</a>
+            <a class="dropdown-item" href="/genero/14">🧙 Fantasia</a>
+            <a class="dropdown-item" href="/genero/27">👻 Terror</a>
+            <a class="dropdown-item" href="/genero/9648">🔍 Mistério</a>
+            <a class="dropdown-item" href="/genero/10749">💕 Romance</a>
+            <a class="dropdown-item" href="/genero/878">🚀 Ficção Científica</a>
+            <a class="dropdown-item" href="/genero/53">🔪 Thriller</a>
+          </div>
+        </div>
+
+        <!-- Dropdown Ano -->
+        <div class="dropdown">
+          <button class="dropdown-btn" onclick="toggleDropdown('anos')" id="btn-anos">
+            Ano
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          <div class="dropdown-menu anos" id="anos">
+            <a class="dropdown-item" href="/ano/2026">🆕 2026</a>
+            <a class="dropdown-item" href="/ano/2025">2025</a>
+            <a class="dropdown-item" href="/ano/2024">2024</a>
+            <a class="dropdown-item" href="/ano/2023">2023</a>
+            <a class="dropdown-item" href="/ano/2022">2022</a>
+            <a class="dropdown-item" href="/ano/2021">2021</a>
+            <a class="dropdown-item" href="/ano/2020">2020</a>
+            <a class="dropdown-item" href="/ano/2019">2019</a>
+            <a class="dropdown-item" href="/ano/2018">2018</a>
+            <a class="dropdown-item" href="/ano/2017">2017</a>
+            <a class="dropdown-item" href="/ano/2016">2016</a>
+            <a class="dropdown-item" href="/ano/2015">2015</a>
+            <a class="dropdown-item" href="/ano/2010">2010</a>
+            <a class="dropdown-item" href="/ano/2005">2005</a>
+            <a class="dropdown-item" href="/ano/2000">2000</a>
+            <a class="dropdown-item" href="/ano/1990">Anos 90</a>
+            <a class="dropdown-item" href="/ano/1980">Anos 80</a>
+          </div>
+        </div>
+
+        <a href="/sobre" class="sobre-link">Sobre nós</a>
+        <a href="/login" class="login-btn">Entrar</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <p class="hero-label">Bem-vindo ao</p>
+    <h1 class="hero-title">Seu banco de<br/><em>filmes</em></h1>
+    <div class="divider"></div>
+  </div>
+
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">
+        {% if request.args.get('q') %}
+          Resultados para "{{ request.args.get('q') }}"
+        {% else %}
+          Em Alta
+        {% endif %}
+      </h2>
+      <span class="section-count">{{ filmes|length }} títulos</span>
+    </div>
+
+    {% if filmes %}
+      <div class="movies-grid">
+        {% for filme in filmes %}
+          {% if filme.poster_path %}
+          <a class="movie-card" href="/{{ filme.tipo }}/{{ filme.id }}">
+            <div class="poster-wrap">
+              <img
+                src="{{ img_base }}{{ filme.poster_path }}"
+                alt="{{ filme.title }}"
+                loading="lazy"
+              />
+              {% if filme.vote_average %}
+                <span class="rating-badge">★ {{ "%.1f"|format(filme.vote_average) }}</span>
+              {% endif %}
+              <span class="tipo-badge tipo-{{ filme.tipo }}">
+                {{ "Filme" if filme.tipo == "filme" else "Série" }}
+              </span>
+            </div>
+            <div class="card-body">
+              <p class="card-title">{{ filme.title }}</p>
+              <p class="card-year">
+                {% if filme.release_date %}
+                  {{ filme.release_date[:4] }}
+                {% endif %}
+              </p>
+            </div>
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Paginação -->
+      <div class="pagination">
+        {% if page > 1 %}
+          <a href="{{ base_url }}page={{ page - 1 }}" class="page-btn">← Anterior</a>
+        {% else %}
+          <span class="page-btn disabled">← Anterior</span>
+        {% endif %}
+
+        <span class="page-number">Página {{ page }}</span>
+
+        <a href="{{ base_url }}page={{ page + 1 }}" class="page-btn">Próxima →</a>
+      </div>
+
+    {% else %}
+      <div class="empty">
+        <div class="empty-icon">🎥</div>
+        <p class="empty-text">Nenhum resultado encontrado.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <footer>
+    A vida é boa quando exploramos outros mundos! &nbsp;|&nbsp;
+    <a href="https://www.themoviedb.org" target="_blank">Dados por TMDB</a>
+  </footer>
+
+  <script>
+    function toggleDropdown(id) {
+      const menu = document.getElementById(id);
+      const btn = document.getElementById('btn-' + id);
+      const isOpen = menu.classList.contains('open');
+
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+      document.querySelectorAll('.dropdown-btn').forEach(b => b.classList.remove('active'));
+
+      if (!isOpen) {
+        menu.classList.add('open');
+        btn.classList.add('active');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+        document.querySelectorAll('.dropdown-btn').forEach(b => b.classList.remove('active'));
+      }
+    });
+  </script>
+
+</body>
+</html>

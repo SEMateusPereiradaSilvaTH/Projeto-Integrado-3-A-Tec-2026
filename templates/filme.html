@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ filme.title }} — TelaCheia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --card: #16161f;
+      --accent: #c084fc;
+      --accent2: #a855f7;
+      --text: #f5f5f5;
+      --muted: #6b6a72;
+      --border: rgba(192, 132, 252, 0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      {% if filme.backdrop_path %}
+      background-image: url("https://image.tmdb.org/t/p/w1280{{ filme.backdrop_path }}");
+      {% endif %}
+      background-size: cover;
+      background-position: center top;
+      filter: blur(2px) brightness(0.18);
+      transform: scale(1.05);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 2rem;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent2); }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    .back-btn:hover { color: var(--accent); }
+
+    .login-btn {
+      background: var(--accent);
+      color: #0a0a0f;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 7px;
+      white-space: nowrap;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .login-btn:hover {
+      background: #d8a4ff;
+      box-shadow: 0 0 14px rgba(192, 132, 252, 0.5);
+    }
+
+    .main {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .movie-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .poster-col { position: sticky; top: 90px; }
+
+    .poster-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px var(--border);
+      aspect-ratio: 2/3;
+      background: var(--surface);
+    }
+
+    .poster-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .no-poster {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: var(--muted);
+    }
+
+    .info-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .genres {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .genre-tag {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 3px 10px;
+    }
+
+    .movie-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+    }
+
+    .movie-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .meta-item strong { color: var(--text); font-weight: 500; }
+
+    .rating-big {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .rating-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .rating-sub {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .stars { color: var(--accent); font-size: 0.8rem; letter-spacing: 0.05em; }
+
+    .divider {
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 0.5rem;
+    }
+
+    .overview {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #b5b3ac;
+      font-weight: 300;
+      max-width: 65ch;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .stat-item {
+      background: var(--card);
+      padding: 1rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* Seção de temporadas */
+    .seasons-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+    }
+
+    .seasons-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .season-block {
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .season-header {
+      background: var(--surface);
+      padding: 0.85rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+
+    .season-header:hover { background: rgba(192, 132, 252, 0.07); }
+
+    .season-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+    }
+
+    .season-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .season-arrow {
+      width: 14px;
+      height: 14px;
+      color: var(--muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .season-block.open .season-arrow { transform: rotate(180deg); }
+
+    .episode-list {
+      display: none;
+    }
+
+    .season-block.open .episode-list { display: block; }
+
+    .episode-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.7rem 1.2rem;
+      border-top: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .episode-item:hover { background: rgba(192, 132, 252, 0.05); }
+
+    .ep-num {
+      font-size: 0.72rem;
+      color: var(--muted);
+      min-width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .ep-name {
+      font-size: 0.88rem;
+      color: var(--text);
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    .ep-rating {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      flex-shrink: 0;
+      min-width: 48px;
+      text-align: right;
+    }
+
+    .ep-rating.low { color: #f87171; }
+    .ep-rating.mid { color: #fbbf24; }
+    .ep-rating.high { color: #34d399; }
+    .ep-rating.none { color: var(--muted); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    .sobre-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      text-shadow: 0 0 12px rgba(192, 132, 252, 0.8);
+      transition: text-shadow 0.3s;
+    }
+
+    .sobre-link:hover { text-shadow: 0 0 20px rgba(192, 132, 252, 1); }
+
+    @media (max-width: 700px) {
+      .movie-layout { grid-template-columns: 1fr; }
+      .poster-col { position: static; max-width: 220px; }
+      .main { padding: 2rem 1rem 4rem; }
+      .seasons-section { padding: 0 1rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  {% if filme.backdrop_path %}
+  <div class="backdrop"></div>
+  {% endif %}
+
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">Tela<span>Cheia🍿</span></a>
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <a href="/" class="back-btn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          Voltar
+        </a>
+        <a href="/sobre" class="sobre-link">Sobre nós</a>
+        <a href="/login" class="login-btn">Entrar</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="movie-layout">
+
+      <div class="poster-col">
+        <div class="poster-wrap">
+          {% if filme.poster_path %}
+            <img src="{{ img_base }}{{ filme.poster_path }}" alt="{{ filme.title }}" />
+          {% else %}
+            <div class="no-poster">🎬</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="info-col">
+
+        {% if filme.genres %}
+        <div class="genres">
+          {% for g in filme.genres %}
+            <span class="genre-tag">{{ g.name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <h1 class="movie-title">{{ filme.title }}</h1>
+
+        {% if filme.tagline %}
+          <p style="font-style:italic; color:var(--muted); font-size:0.9rem;">"{{ filme.tagline }}"</p>
+        {% endif %}
+
+        <div class="movie-meta">
+          {% if filme.release_date %}
+          <div class="meta-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <strong>{{ filme.release_date[:4] }}</strong>
+          </div>
+          {% endif %}
+
+          {% if filme.runtime %}
+          <div class="meta-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <strong>{{ filme.runtime }} min</strong>
+          </div>
+          {% endif %}
+
+          {% if filme.vote_average %}
+          <div class="rating-big">
+            <span class="rating-number">{{ "%.1f"|format(filme.vote_average) }}</span>
+            <div class="rating-sub">
+              <span class="stars">★★★★★</span>
+              <span>{{ filme.vote_count }} votos</span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="divider"></div>
+
+        {% if filme.overview %}
+        <div>
+          <p class="section-label">Sinopse</p>
+          <p class="overview">{{ filme.overview }}</p>
+        </div>
+        {% endif %}
+
+        <div class="stats-grid">
+          {% if filme.original_title and filme.original_title != filme.title %}
+          <div class="stat-item">
+            <span class="stat-label">Título Original</span>
+            <span class="stat-value">{{ filme.original_title }}</span>
+          </div>
+          {% endif %}
+
+          {% if filme.original_language %}
+          <div class="stat-item">
+            <span class="stat-label">Idioma</span>
+            <span class="stat-value">{{ filme.original_language | upper }}</span>
+          </div>
+          {% endif %}
+
+          {% if filme.status %}
+          <div class="stat-item">
+            <span class="stat-label">Status</span>
+            <span class="stat-value">{{ filme.status }}</span>
+          </div>
+          {% endif %}
+
+          {% if filme.budget and filme.budget > 0 %}
+          <div class="stat-item">
+            <span class="stat-label">Orçamento</span>
+            <span class="stat-value">${{ "{:,}".format(filme.budget) }}</span>
+          </div>
+          {% endif %}
+
+          {% if filme.revenue and filme.revenue > 0 %}
+          <div class="stat-item">
+            <span class="stat-label">Bilheteria</span>
+            <span class="stat-value">${{ "{:,}".format(filme.revenue) }}</span>
+          </div>
+          {% endif %}
+
+          {% if filme.popularity %}
+          <div class="stat-item">
+            <span class="stat-label">Popularidade</span>
+            <span class="stat-value">{{ "%.0f"|format(filme.popularity) }}</span>
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Seção de temporadas (só aparece pra séries) -->
+  {% if seasons %}
+  <div class="seasons-section">
+    <h2 class="seasons-title">Episódios por Temporada</h2>
+
+    {% for season in seasons %}
+    <div class="season-block" id="season-{{ loop.index }}">
+      <div class="season-header" onclick="toggleSeason('season-{{ loop.index }}')">
+        <span class="season-name">{{ season.name }}</span>
+        <span class="season-meta">{{ season.episodes|length }} episódios</span>
+        <svg class="season-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+      <div class="episode-list">
+        {% for ep in season.episodes %}
+        <div class="episode-item">
+          <span class="ep-num">{{ ep.episode_number }}</span>
+          <span class="ep-name">{{ ep.name }}</span>
+          {% if ep.vote_average and ep.vote_average > 0 %}
+            {% if ep.vote_average >= 8 %}
+              <span class="ep-rating high">★ {{ "%.1f"|format(ep.vote_average) }}</span>
+            {% elif ep.vote_average >= 6 %}
+              <span class="ep-rating mid">★ {{ "%.1f"|format(ep.vote_average) }}</span>
+            {% else %}
+              <span class="ep-rating low">★ {{ "%.1f"|format(ep.vote_average) }}</span>
+            {% endif %}
+          {% else %}
+            <span class="ep-rating none">—</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <footer>
+  A vida é boa quando exploramos outros mundos!
+    <a href="https://www.themoviedb.org" target="_blank">TMDB</a>.
+  </footer>
+
+  <script>
+    function toggleSeason(id) {
+      const block = document.getElementById(id);
+      block.classList.toggle('open');
+    }
+  </script>
+
+</body>
+</html>
