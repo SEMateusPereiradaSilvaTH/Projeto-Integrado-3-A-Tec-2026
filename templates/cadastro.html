@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — TelaCheia</title>
+  <title>Cadastro — TelaCheia</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -105,13 +105,13 @@
       z-index: 1;
     }
 
-    .login-card {
+    .cadastro-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 2.5rem 2rem;
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       box-shadow: 0 30px 60px rgba(0,0,0,0.5);
       animation: fadeUp 0.5s ease both;
     }
@@ -129,7 +129,6 @@
       font-size: 2.5rem;
       letter-spacing: 0.04em;
       color: var(--text);
-      margin-bottom: 0.25rem;
       line-height: 1;
     }
 
@@ -137,8 +136,7 @@
       width: 40px;
       height: 2px;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
-      margin-bottom: 2rem;
-      margin-top: 0.75rem;
+      margin: 0.75rem 0 2rem;
     }
 
     .input-group {
@@ -175,7 +173,6 @@
       box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.08);
     }
 
-    /* Botão olhinho */
     .toggle-senha {
       position: absolute;
       right: 0.75rem;
@@ -192,7 +189,6 @@
 
     .toggle-senha:hover { color: var(--accent); }
 
-    /* Aviso caps lock */
     .caps-aviso {
       display: none;
       font-size: 0.72rem;
@@ -204,7 +200,6 @@
 
     .caps-aviso.visivel { display: flex; }
 
-    /* Mensagem de erro */
     .msg {
       font-size: 0.82rem;
       padding: 0.6rem 0.9rem;
@@ -216,6 +211,12 @@
       background: rgba(248, 113, 113, 0.1);
       border: 1px solid rgba(248, 113, 113, 0.3);
       color: #f87171;
+    }
+
+    .msg.sucesso {
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      color: #34d399;
     }
 
     .submit-btn {
@@ -279,34 +280,40 @@
   <header>
     <div class="header-inner">
       <a href="/" class="logo">Tela<span>Cheia🍿</span></a>
-      <a href="/" class="back-btn">
+      <a href="/login" class="back-btn">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M19 12H5M12 5l-7 7 7 7"/>
         </svg>
-        Voltar
+        Voltar ao login
       </a>
     </div>
   </header>
 
   <div class="main">
-    <div class="login-card">
-      <p class="card-label">Bem-vindo de volta</p>
-      <h1 class="card-title">Login</h1>
+    <div class="cadastro-card">
+      <p class="card-label">Crie sua conta</p>
+      <h1 class="card-title">Cadastro</h1>
       <div class="divider"></div>
 
       {% if erro %}
         <div class="msg erro">{{ erro }}</div>
       {% endif %}
+      {% if sucesso %}
+        <div class="msg sucesso">{{ sucesso }}</div>
+      {% endif %}
 
-      <form action="/login" method="post">
+      <form action="/cadastro" method="post">
         <div class="input-group">
           <label for="nome">Usuário</label>
-          <input type="text" id="nome" name="nome" placeholder="Seu nome de usuário" required autocomplete="off"/>
+          <input type="text" id="nome" name="nome" placeholder="Escolha um nome de usuário" required autocomplete="off"/>
         </div>
-
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Seu endereço de email" required/>
+        </div>
         <div class="input-group">
           <label for="senha">Senha</label>
-          <input type="password" id="senha" name="senha" placeholder="Sua senha" required/>
+          <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required/>
           <button type="button" class="toggle-senha" onclick="toggleSenha('senha', 'icone-senha')" title="Mostrar/ocultar senha">
             <svg id="icone-senha" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -319,11 +326,11 @@
           </div>
         </div>
 
-        <button class="submit-btn" type="submit">Entrar</button>
+        <button class="submit-btn" type="submit">Criar conta</button>
       </form>
 
       <div class="card-footer">
-        Não tem conta? <a href="/cadastro">Criar conta</a>
+        Já tem conta? <a href="/login">Fazer login</a>
       </div>
     </div>
   </div>
@@ -334,7 +341,6 @@
   </footer>
 
   <script>
-    // Mostrar/ocultar senha
     function toggleSenha(inputId, iconeId) {
       const input = document.getElementById(inputId);
       const icone = document.getElementById(iconeId);
@@ -347,7 +353,6 @@
       }
     }
 
-    // Caps Lock
     document.getElementById("senha").addEventListener("keyup", function(e) {
       const aviso = document.getElementById("caps-aviso");
       if (e.getModifierState("CapsLock")) {

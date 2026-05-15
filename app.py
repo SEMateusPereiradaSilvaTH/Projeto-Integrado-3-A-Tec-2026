@@ -1,15 +1,95 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session
 import requests
+import sqlite3
+import hashlib
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY")
 
-API_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMjYwMmZjMmNmZmJmOTQ0ZjJiNzU0ZDZlNmQxZWE1MSIsIm5iZiI6MTc3NzQ5MDk3OS4wNTMsInN1YiI6IjY5ZjI1YzIzNzk0MGEzOGY0MDdiZWViNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.qr16rcpUhfh4-ZV2J1NxdNWFV-bn8vl1IWMVUsg8lsY"
+API_TOKEN = os.getenv("TMDB_API_TOKEN")
 BASE_URL = "https://api.themoviedb.org/3"
 IMG_BASE = "https://image.tmdb.org/t/p/w500"
 HEADERS = {
     "Authorization": f"Bearer {API_TOKEN}",
     "accept": "application/json"
 }
+
+# ─── Banco de dados ───────────────────────────────────────────────────────────
+
+def init_db():
+    conn = sqlite3.connect("usuarios.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT UNIQUE NOT NULL,
+            senha TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def hash_senha(senha):
+    return hashlib.sha256(senha.encode()).hexdigest()
+
+init_db()
+
+# ─── Login / Cadastro ─────────────────────────────────────────────────────────
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    erro = None
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        senha = request.form.get("senha", "").strip()
+
+        conn = sqlite3.connect("usuarios.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE nome = ? AND senha = ?", (nome, hash_senha(senha)))
+        usuario = cursor.fetchone()
+        conn.close()
+
+        if usuario:
+            session["usuario"] = nome
+            return redirect(url_for("index"))
+        else:
+            erro = "Usuário ou senha incorretos."
+
+    return render_template("login.html", erro=erro)
+
+@app.route("/cadastro", methods=["GET", "POST"])
+def cadastro():
+    erro = None
+    sucesso = None
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        senha = request.form.get("senha", "").strip()
+
+        if not nome or not senha:
+            erro = "Preencha todos os campos."
+        else:
+            try:
+                conn = sqlite3.connect("usuarios.db")
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO usuarios (nome, senha) VALUES (?, ?)", (nome, hash_senha(senha)))
+                conn.commit()
+                conn.close()
+                sucesso = "Conta criada! Faça login."
+            except sqlite3.IntegrityError:
+                erro = "Esse nome de usuário já existe."
+
+    return render_template("cadastro.html", erro=erro, sucesso=sucesso)
+
+@app.route("/logout")
+def logout():
+    session.pop("usuario", None)
+    return redirect(url_for("index"))
+
+# ─── Rotas principais ─────────────────────────────────────────────────────────
 
 @app.route("/")
 def index():
@@ -97,7 +177,6 @@ def serie(serie_id):
     serie["runtime"] = serie.get("episode_run_time", [0])[0] if serie.get("episode_run_time") else None
     serie["tipo"] = "serie"
 
-    # busca episódios de cada temporada (ignora temporada 0 = especiais)
     seasons_data = []
     num_temporadas = serie.get("number_of_seasons", 0)
     for i in range(1, num_temporadas + 1):
