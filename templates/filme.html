@@ -271,7 +271,6 @@
       color: var(--text);
     }
 
-    /* Seção de temporadas */
     .seasons-section {
       position: relative;
       z-index: 1;
@@ -406,6 +405,74 @@
 
     .sobre-link:hover { text-shadow: 0 0 20px rgba(192, 132, 252, 1); }
 
+    .user-chip { font-size: 0.85rem; color: var(--text); white-space: nowrap; }
+
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+    .actions form { margin: 0; }
+
+    .act-btn, .status-select {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .act-btn:hover, .status-select:hover { border-color: var(--accent); color: var(--accent); }
+    .act-btn.on { background: rgba(192, 132, 252, 0.15); border-color: var(--accent); color: var(--accent); }
+    .status-select option { background: var(--surface); color: var(--text); }
+
+    .login-hint { font-size: 0.85rem; color: var(--muted); }
+    .login-hint a { color: var(--accent); text-decoration: none; }
+
+    .site-rating { font-size: 0.82rem; color: var(--muted); }
+    .site-rating strong { color: var(--accent); font-weight: 500; }
+
+    .reviews-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+    }
+
+    .review-form { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; max-width: 600px; }
+
+    .review-form textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .review-form textarea:focus { border-color: var(--accent); }
+    .review-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .star-input { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 0.15rem; position: relative; }
+    .star-input input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .star-input label { font-size: 1.9rem; line-height: 1; color: var(--muted); cursor: pointer; transition: color 0.15s; }
+    .star-input input:checked ~ label,
+    .star-input label:hover,
+    .star-input label:hover ~ label { color: var(--accent); }
+
+    .review-item { border: 1px solid var(--border); border-radius: 10px; background: var(--card); padding: 0.9rem 1.1rem; margin-bottom: 0.75rem; }
+    .review-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.3rem; }
+    .review-user { font-size: 0.88rem; font-weight: 500; }
+    .review-stars { color: var(--accent); font-size: 0.85rem; letter-spacing: 0.05em; }
+    .review-text { margin-top: 0.4rem; font-size: 0.88rem; line-height: 1.6; color: #b5b3ac; font-weight: 300; white-space: pre-line; }
+    .no-reviews { font-size: 0.88rem; color: var(--muted); }
+
     @media (max-width: 700px) {
       .movie-layout { grid-template-columns: 1fr; }
       .poster-col { position: static; max-width: 220px; }
@@ -431,7 +498,13 @@
           Voltar
         </a>
         <a href="/sobre" class="sobre-link">Sobre nós</a>
-        <a href="/login" class="login-btn">Entrar</a>
+        {% if session.get('usuario') %}
+          <span class="user-chip">👤 {{ session['usuario'] }}</span>
+          <a href="/favoritos" class="sobre-link">Favoritos</a>
+          <a href="/logout" class="login-btn">Sair</a>
+        {% else %}
+          <a href="/login" class="login-btn">Entrar</a>
+        {% endif %}
       </div>
     </div>
   </header>
@@ -493,6 +566,31 @@
 
         <div class="divider"></div>
 
+        <div class="actions">
+          {% if session.get('usuario') %}
+            <form method="post" action="/favoritar/{{ filme.tipo }}/{{ filme.id }}">
+              <button type="submit" class="act-btn {{ 'on' if favorito }}">
+                {{ '♥ Favoritado' if favorito else '♡ Favoritar' }}
+              </button>
+            </form>
+
+            <form method="post" action="/status/{{ filme.tipo }}/{{ filme.id }}">
+              <select name="status" class="status-select" onchange="this.form.submit()" aria-label="Minha lista">
+                <option value="" {{ 'selected' if not status_atual }}>＋ Minha lista</option>
+                <option value="quero_ver" {{ 'selected' if status_atual == 'quero_ver' }}>Quero ver</option>
+                <option value="assistindo" {{ 'selected' if status_atual == 'assistindo' }}>Assistindo</option>
+                <option value="assistido" {{ 'selected' if status_atual == 'assistido' }}>Assistido</option>
+              </select>
+            </form>
+          {% else %}
+            <span class="login-hint"><a href="/login">Entre</a> para favoritar, avaliar e montar sua lista.</span>
+          {% endif %}
+
+          {% if media_site %}
+            <span class="site-rating">Nota TelaCheia: <strong>★ {{ "%.1f"|format(media_site) }}</strong> ({{ total_site }})</span>
+          {% endif %}
+        </div>
+
         {% if filme.overview %}
         <div>
           <p class="section-label">Sinopse</p>
@@ -548,7 +646,44 @@
     </div>
   </div>
 
-  <!-- Seção de temporadas (só aparece pra séries) -->
+  <section class="reviews-section">
+    <h2 class="seasons-title">Avaliações</h2>
+
+    {% if session.get('usuario') %}
+    <form class="review-form" method="post" action="/avaliar/{{ filme.tipo }}/{{ filme.id }}">
+      <div class="star-input">
+        {% for n in [5, 4, 3, 2, 1] %}
+          <input type="radio" id="nota{{ n }}" name="nota" value="{{ n }}" required
+                 {{ 'checked' if minha_avaliacao and minha_avaliacao.nota == n }}>
+          <label for="nota{{ n }}" title="{{ n }} de 5">★</label>
+        {% endfor %}
+      </div>
+      <textarea name="comentario" maxlength="1000" placeholder="Escreva um comentário (opcional)">{{ minha_avaliacao.comentario if minha_avaliacao and minha_avaliacao.comentario else '' }}</textarea>
+      <div>
+        <button type="submit" class="act-btn on">{{ 'Atualizar avaliação' if minha_avaliacao else 'Salvar avaliação' }}</button>
+      </div>
+    </form>
+
+    {% if minha_avaliacao %}
+    <form method="post" action="/avaliar/{{ filme.tipo }}/{{ filme.id }}/remover" style="margin-bottom:1.5rem;">
+      <button type="submit" class="act-btn">Remover minha avaliação</button>
+    </form>
+    {% endif %}
+    {% endif %}
+
+    {% for a in avaliacoes %}
+      <div class="review-item">
+        <div class="review-head">
+          <span class="review-user">{{ a.nome }}</span>
+          <span class="review-stars">{{ '★' * a.nota }}{{ '☆' * (5 - a.nota) }}</span>
+        </div>
+        {% if a.comentario %}<p class="review-text">{{ a.comentario }}</p>{% endif %}
+      </div>
+    {% else %}
+      <p class="no-reviews">Ainda não há avaliações. Seja o primeiro!</p>
+    {% endfor %}
+  </section>
+
   {% if seasons %}
   <div class="seasons-section">
     <h2 class="seasons-title">Episódios por Temporada</h2>

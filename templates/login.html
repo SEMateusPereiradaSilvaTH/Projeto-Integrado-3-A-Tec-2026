@@ -175,7 +175,6 @@
       box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.08);
     }
 
-    /* Botão olhinho */
     .toggle-senha {
       position: absolute;
       right: 0.75rem;
@@ -192,7 +191,6 @@
 
     .toggle-senha:hover { color: var(--accent); }
 
-    /* Aviso caps lock */
     .caps-aviso {
       display: none;
       font-size: 0.72rem;
@@ -204,7 +202,6 @@
 
     .caps-aviso.visivel { display: flex; }
 
-    /* Mensagem de erro */
     .msg {
       font-size: 0.82rem;
       padding: 0.6rem 0.9rem;
@@ -334,7 +331,6 @@
   </footer>
 
   <script>
-    // Mostrar/ocultar senha
     function toggleSenha(inputId, iconeId) {
       const input = document.getElementById(inputId);
       const icone = document.getElementById(iconeId);
@@ -347,7 +343,6 @@
       }
     }
 
-    // Caps Lock
     document.getElementById("senha").addEventListener("keyup", function(e) {
       const aviso = document.getElementById("caps-aviso");
       if (e.getModifierState("CapsLock")) {

@@ -1,6 +1,18 @@
+# Segredos
 .env
+
+# Banco de dados com dados dos usuários
+usuarios.db
 *.db
+*.sqlite3
+
+# Ambiente virtual
+venv/
+.venv/
+
+# Cache do Python
 __pycache__/
 *.pyc
-.venv/
-venv/
+
+# Editor (opcional)
+.vscode/

@@ -11,9 +11,7 @@
   />
 
   <style>
-    /* =========================
-       RESET
-    ========================= */
+
     *,
     *::before,
     *::after {
@@ -22,9 +20,6 @@
       padding: 0;
     }
 
-    /* =========================
-       VARIÁVEIS
-    ========================= */
     :root {
       --bg: #0a0a0f;
       --surface: #12121a;
@@ -39,9 +34,6 @@
       --border: rgba(192, 132, 252, 0.12);
     }
 
-    /* =========================
-       BASE
-    ========================= */
     html {
       scroll-behavior: smooth;
     }
@@ -66,9 +58,6 @@
       opacity: 0.4;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
     header {
       position: sticky;
       top: 0;
@@ -108,9 +97,6 @@
       color: var(--accent2);
     }
 
-    /* =========================
-       BUSCA
-    ========================= */
     .search-form {
       position: relative;
 
@@ -183,9 +169,6 @@
       height: 14px;
     }
 
-    /* =========================
-       BOTÃO HAMBÚRGUER
-    ========================= */
     .hamburger-btn {
       position: relative;
       z-index: 201;
@@ -255,9 +238,6 @@
       transform: translateY(-7px) rotate(-45deg);
     }
 
-    /* =========================
-       SOBREPOSIÇÃO ESCURA
-    ========================= */
     .nav-overlay {
       position: fixed;
       inset: 0;
@@ -277,9 +257,6 @@
       pointer-events: all;
     }
 
-    /* =========================
-       MENU LATERAL
-    ========================= */
     .nav-drawer {
       position: fixed;
       top: 0;
@@ -307,9 +284,6 @@
       transform: translateX(0);
     }
 
-    /* =========================
-       TOPO DO MENU
-    ========================= */
     .drawer-top {
       height: 64px;
 
@@ -379,9 +353,6 @@
       background: #d8a4ff;
     }
 
-    /* =========================
-       CORPO DO MENU
-    ========================= */
     .drawer-body {
       flex: 1;
       overflow-y: auto;
@@ -390,9 +361,6 @@
       scrollbar-color: var(--accent) transparent;
     }
 
-    /* =========================
-       SEÇÕES COLAPSÁVEIS
-    ========================= */
     .collapse-section {
       border-bottom: 1px solid var(--border);
     }
@@ -482,9 +450,6 @@
       color: var(--accent);
     }
 
-    /* =========================
-       ITEM SIMPLES
-    ========================= */
     .drawer-simple {
       display: flex;
       align-items: center;
@@ -510,9 +475,6 @@
       color: var(--accent);
     }
 
-    /* =========================
-       HERO
-    ========================= */
     .hero {
       max-width: 1400px;
 
@@ -564,9 +526,6 @@
       margin-bottom: 2.5rem;
     }
 
-    /* =========================
-       SEÇÕES
-    ========================= */
     .section {
       max-width: 1400px;
 
@@ -597,9 +556,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* =========================
-       GRID DE FILMES
-    ========================= */
     .movies-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -648,9 +604,6 @@
     .movie-card:nth-child(7) { animation-delay: .35s; }
     .movie-card:nth-child(8) { animation-delay: .4s; }
 
-    /* =========================
-       POSTER
-    ========================= */
     .poster-wrap {
       position: relative;
 
@@ -687,9 +640,6 @@
       font-size: 2rem;
     }
 
-    /* =========================
-       BADGES
-    ========================= */
     .rating-badge {
       position: absolute;
       top: 8px;
@@ -739,9 +689,6 @@
       color: #34d399;
     }
 
-    /* =========================
-       CONTEÚDO DOS CARDS
-    ========================= */
     .card-body {
       flex: 1;
 
@@ -768,9 +715,6 @@
       font-size: 0.72rem;
     }
 
-    /* =========================
-       ESTADO VAZIO
-    ========================= */
     .empty {
       text-align: center;
 
@@ -792,9 +736,6 @@
       font-weight: 300;
     }
 
-    /* =========================
-       PAGINAÇÃO
-    ========================= */
     .pagination {
       display: flex;
       align-items: center;
@@ -842,9 +783,6 @@
       font-size: 0.85rem;
     }
 
-    /* =========================
-       RODAPÉ
-    ========================= */
     footer {
       padding: 1.5rem 2rem;
 
@@ -865,9 +803,6 @@
       text-decoration: none;
     }
 
-    /* =========================
-       ANIMAÇÕES
-    ========================= */
     @keyframes fadeUp {
       from {
         opacity: 0;
@@ -880,9 +815,31 @@
       }
     }
 
-    /* =========================
-       RESPONSIVIDADE
-    ========================= */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.35rem 1rem;
+      font-size: 0.82rem;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .tab:hover { border-color: var(--accent); color: var(--accent); }
+
+    .tab.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(192, 132, 252, 0.12);
+    }
+
     @media (max-width: 600px) {
       .header-inner {
         gap: 1rem;
@@ -906,6 +863,124 @@
         border-left: none;
       }
     }
+    .ia-box {
+  margin-bottom: 2.5rem;
+  padding: 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.ia-titulo {
+  margin-bottom: 0.25rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+}
+
+.ia-sub {
+  margin-bottom: 0.9rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.ia-linha {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ia-input {
+  flex: 1;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ia-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.08);
+}
+
+.ia-btn {
+  white-space: nowrap;
+  background: var(--accent);
+  color: #0a0a0f;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.ia-btn:hover { background: #d8a4ff; }
+.ia-btn:disabled { opacity: 0.6; cursor: wait; }
+
+.ia-msg {
+  margin-top: 0.75rem;
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.ia-login {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.ia-login a { color: var(--accent); }
+
+@media (max-width: 600px) {
+  .ia-linha { flex-direction: column; }
+}
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+      font-size: 0.85rem;
+    }
+
+    .header-user-nome {
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .header-user-link {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .header-user-link:hover { color: #d8a4ff; }
+
+    .header-user-btn {
+      background: var(--accent);
+      color: #0a0a0f;
+      text-decoration: none;
+      border-radius: 7px;
+      padding: 0.4rem 1rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .header-user-btn:hover { background: #d8a4ff; }
+
+    @media (max-width: 600px) {
+      .header-user-link { display: none; }
+      .header-user-nome { max-width: 80px; }
+    }
   </style>
 </head>
 
@@ -913,10 +988,8 @@
 
   <div class="nav-overlay" id="nav-overlay" onclick="closeMenu()"></div>
 
-  <!-- DRAWER LATERAL -->
   <nav class="nav-drawer" id="nav-drawer" aria-label="Menu principal">
 
-    <!-- Topo fixo: voltar + entrar -->
     <div class="drawer-top">
       <button class="drawer-back-btn" onclick="closeMenu()" aria-label="Fechar menu">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -924,13 +997,15 @@
         </svg>
         Voltar
       </button>
-      <a href="/login" class="drawer-login-top">Entrar</a>
+      {% if session.get('usuario') %}
+        <a href="/logout" class="drawer-login-top">Sair</a>
+      {% else %}
+        <a href="/login" class="drawer-login-top">Entrar</a>
+      {% endif %}
     </div>
 
-    <!-- Corpo com scroll -->
     <div class="drawer-body">
 
-      <!-- Gêneros -->
       <div class="collapse-section">
         <button class="collapse-trigger" onclick="toggleCollapse('generos-body', this)">
           Gêneros
@@ -957,7 +1032,6 @@
         </div>
       </div>
 
-      <!-- Ano -->
       <div class="collapse-section">
         <button class="collapse-trigger" onclick="toggleCollapse('anos-body', this)">
           Ano
@@ -989,13 +1063,16 @@
         </div>
       </div>
 
-      <!-- Sobre nós -->
+      {% if session.get('usuario') %}
+      <a class="drawer-simple" href="/favoritos">♥ Meus favoritos</a>
+      <a class="drawer-simple" href="/minha-lista">📋 Minha lista</a>
+      {% endif %}
+
       <a class="drawer-simple" href="/sobre">ℹ️ Sobre nós</a>
 
     </div>
   </nav>
 
-  <!-- HEADER -->
   <header>
     <div class="header-inner">
 
@@ -1024,6 +1101,15 @@
           </svg>
         </button>
       </form>
+            <div class="header-user">
+        {% if session.get('usuario') %}
+          <span class="header-user-nome">👤 {{ session.get('usuario') }}</span>
+          <a href="/favoritos" class="header-user-link">Favoritos</a>
+          <a href="/logout" class="header-user-btn">Sair</a>
+        {% else %}
+          <a href="/login" class="header-user-btn">Entrar</a>
+        {% endif %}
+      </div>
 
       <button
         class="hamburger-btn"
@@ -1040,7 +1126,6 @@
     </div>
   </header>
 
-  <!-- HERO -->
   <div class="hero">
     <p class="hero-label">Bem-vindo ao</p>
 
@@ -1052,12 +1137,39 @@
     <div class="divider"></div>
   </div>
 
-  <!-- CONTEÚDO -->
   <section class="section">
+    <div class="ia-box">
+  <h2 class="ia-titulo">🍿 Pergunte à PipocandoBot</h2>
+  <p class="ia-sub">Descreva o que você quer assistir e a IA sugere títulos pra você.</p>
+
+  <form class="ia-linha" action="/ia/recomendar" method="post" onsubmit="iaCarregando(this)">
+    <input
+      class="ia-input"
+      type="text"
+      name="pedido"
+      maxlength="300"
+      required
+      autocomplete="off"
+      placeholder="Ex: suspense curto pra ver com a namorada"
+      value="{{ ia_pedido or '' }}"
+    />
+    <button class="ia-btn" type="submit">Sugerir</button>
+  </form>
+
+  {% if mensagem_ia %}
+    <p class="ia-msg">{{ mensagem_ia }}</p>
+  {% endif %}
+
+  {% if not session.get('usuario_id') %}
+    <p class="ia-login"><a href="/login">Entre</a> para usar a IA.</p>
+  {% endif %}
+</div>
 
     <div class="section-header">
       <h2 class="section-title">
-        {% if request.args.get('q') %}
+        {% if titulo_secao %}
+          {{ titulo_secao }}
+        {% elif request.args.get('q') %}
           Resultados para "{{ request.args.get('q') }}"
         {% else %}
           Em Alta
@@ -1068,6 +1180,14 @@
         {{ filmes|length }} títulos
       </span>
     </div>
+
+    {% if abas %}
+      <div class="tabs">
+        {% for rotulo, link, ativa in abas %}
+          <a class="tab {{ 'active' if ativa }}" href="{{ link }}">{{ rotulo }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
 
     {% if filmes %}
 
@@ -1115,6 +1235,7 @@
 
       </div>
 
+      {% if not sem_paginacao %}
       <div class="pagination">
 
         {% if page > 1 %}
@@ -1136,6 +1257,7 @@
         </a>
 
       </div>
+      {% endif %}
 
     {% else %}
 
@@ -1157,6 +1279,11 @@
   </footer>
 
   <script>
+    function iaCarregando(form) {
+  const btn = form.querySelector('.ia-btn');
+  btn.disabled = true;
+  btn.textContent = 'Pensando...';
+}
     function toggleMenu() {
       const btn = document.getElementById('hamburger-btn');
       const drawer = document.getElementById('nav-drawer');
